@@ -3,7 +3,7 @@ Android-Shapeways
 
 <p>Example app for invoking the <a href="http://developers.shapeways.com/getting-started?li=dh_gs">Shapeways API</a> from an Android app.</p>
 
-p>To run the App: 
+<p>To run the App: 
 <ul>
 <li>Check out the code in the <a href="http://eclipse.org">Eclipse</a> IDE.</li>
 <li>Create an account on <a href="http://shapeways.com">Shapeways</a>.</li>
