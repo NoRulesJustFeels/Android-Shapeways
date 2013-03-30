@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Shapeways</string>
+    <string name="action_settings">Settings</string>
+    <string name="button_invoke_api">Invoke API</string>
+    
+    <!-- API -->
+    <string name="shapeways_web_error_title">Error</string>
+    <string name="shapeways_web_error">The following error has occurred: %s</string>
+    <string name="shapeways_dialog_exit">Exit</string>
+    <string name="shapeways_dialog_reload">Reload</string>
+    <string name="shapeways_retry">Retry&#8230;</string>
+    <string name="shapeways_authentication_failed">Authentication Failed</string>
+    <string name="shapeways_loading">Loading&#8230;</string>
+
+</resources>
