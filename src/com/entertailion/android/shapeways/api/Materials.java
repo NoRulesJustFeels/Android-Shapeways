@@ -41,15 +41,15 @@ public class Materials extends Base {
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class Material {
-		private String materialId, title, printerId, swatch;
-		private int supportsColorFiles;
+		private String title, printerId, swatch;
+		private int materialId, supportsColorFiles;
 		
 		@JsonProperty("materialId")
-		public String getMaterialId() {
+		public int getMaterialId() {
 			return materialId;
 		}
 		@JsonProperty("materialId")
-		public void setMaterialId(String materialId) {
+		public void setMaterialId(int materialId) {
 			this.materialId = materialId;
 		}
 		@JsonProperty("title")

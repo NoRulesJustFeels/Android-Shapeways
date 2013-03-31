@@ -40,15 +40,16 @@ public class Printers extends Base {
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class Printer {
-		private String printerId, title;
+		private String title;
+		private int printerId;
 		private float xBoundMin, xBoundMax, yBoundMin, yBoundMax, zBoundMin, zBoundMax;
 		
 		@JsonProperty("printerId")
-		public String getPrinterId() {
+		public int getPrinterId() {
 			return printerId;
 		}
 		@JsonProperty("printerId")
-		public void setPrinterId(String printerId) {
+		public void setPrinterId(int printerId) {
 			this.printerId = printerId;
 		}
 		@JsonProperty("title")

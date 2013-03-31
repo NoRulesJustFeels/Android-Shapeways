@@ -49,6 +49,7 @@ public class Base {
 	public enum Result {
 		// {"result":"success","itemCount":0,"items":[],"nextActionSuggestions":[]}
 		// {"result":"failure","reason":"\n Field <modelId> is required, but missing."}
+		// {"result":"success","modelId":"1005240"} // delete model
 		success, failure
 	};
 

@@ -15,19 +15,21 @@
  */
 package com.entertailion.android.shapeways;
 
-import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
@@ -44,6 +46,7 @@ import com.entertailion.android.shapeways.api.Base;
 import com.entertailion.android.shapeways.api.Base.Result;
 import com.entertailion.android.shapeways.api.Materials;
 import com.entertailion.android.shapeways.api.Materials.Material;
+import com.entertailion.android.shapeways.api.Model;
 import com.entertailion.android.shapeways.api.Models;
 import com.entertailion.android.shapeways.api.Orders;
 import com.entertailion.android.shapeways.api.Prices;
@@ -86,12 +89,15 @@ public class MainActivity extends Activity {
 				new Thread(new Runnable() {
 					public void run() {
 						getApi();
-						//getOrders();
+						// getOrders();
 						// getPrinters();
 						// getMaterials();
 						// postOrder();
-						// getModels();
+						//getModels();
+						// getModel();
+						// deleteModel();
 						// postPrices();
+						// doOAuth1();
 					}
 				}).start();
 			}
@@ -133,6 +139,11 @@ public class MainActivity extends Activity {
 			Orders orders = mapper.readValue(response, Orders.class);
 			Log.i(LOG_TAG, "result=" + orders.getResult());
 			Log.i(LOG_TAG, "getItemCount=" + orders.getItemCount());
+			if (orders.getItemCount() > 0) {
+				Log.i(LOG_TAG, "item: materialId=" + orders.getItems().get(0).getMaterialId());
+				Log.i(LOG_TAG, "item: modelId=" + orders.getItems().get(0).getModelId());
+				Log.i(LOG_TAG, "item: quantity=" + orders.getItems().get(0).getQuantity());
+			}
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "getOrders", e);
 		}
@@ -141,12 +152,8 @@ public class MainActivity extends Activity {
 	private void postOrder() {
 		Log.d(LOG_TAG, "postOrder");
 		try {
-			Map<String, String> parameters = new HashMap<String, String>();
-			parameters.put(ShapewaysClient.MODEL_ID_PARAMETER, "1002632");
-			parameters.put(ShapewaysClient.MATERIAL_ID_PARAMETER, "6");
-			parameters.put(ShapewaysClient.QUANTITY_ID_PARAMETER, "1");
 			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().postResponse(
-					ShapewaysClient.API_URL_BASE + ShapewaysClient.ORDERS_PATH, parameters);
+					ShapewaysClient.API_URL_BASE + ShapewaysClient.ORDERS_PATH, "{\"modelId\":1002632,\"materialId\":6,\"quantity\":1}");
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -216,7 +223,7 @@ public class MainActivity extends Activity {
 							Log.d(LOG_TAG, "namefield=" + namefield);
 							jp.nextToken(); // move to value
 							if ("materialId".equals(namefield)) {
-								material.setMaterialId(jp.getText());
+								material.setMaterialId(Integer.parseInt(jp.getText()));
 							} else if ("title".equals(namefield)) {
 								material.setTitle(jp.getText());
 							} else if ("supportsColorFiles".equals(namefield)) {
@@ -285,15 +292,51 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	private void getModel() {
+		Log.d(LOG_TAG, "getModel");
+		try {
+			String path = String.format(ShapewaysClient.MODEL_INFO_PATH, "1002632");
+			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(ShapewaysClient.API_URL_BASE + path);
+			Log.i(LOG_TAG, "response=" + response);
+
+			// http://wiki.fasterxml.com/JacksonInFiveMinutes
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, Object> map = mapper.readValue(response, Map.class);
+			Log.i(LOG_TAG, "map=" + map);
+
+			Model model = mapper.readValue(response, Model.class);
+			Log.i(LOG_TAG, "result=" + model.getResult());
+			Log.i(LOG_TAG, "title=" + model.getTitle());
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "getModels", e);
+		}
+	}
+
+	private void deleteModel() {
+		Log.d(LOG_TAG, "deleteModel");
+		try {
+			String path = String.format(ShapewaysClient.MODEL_INFO_PATH, "1005240");
+			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().deleteResponse(ShapewaysClient.API_URL_BASE + path);
+			Log.i(LOG_TAG, "response=" + response);
+
+			// http://wiki.fasterxml.com/JacksonInFiveMinutes
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, Object> map = mapper.readValue(response, Map.class);
+			Log.i(LOG_TAG, "map=" + map);
+
+			Model model = mapper.readValue(response, Model.class);
+			Log.i(LOG_TAG, "result=" + model.getResult());
+			Log.i(LOG_TAG, "title=" + model.getTitle());
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "deleteModel", e);
+		}
+	}
+
 	private void postPrices() {
 		Log.d(LOG_TAG, "postPrices");
 		try {
-			Map<String, String> parameters = new HashMap<String, String>();
-			// parameters.put(ShapewaysClient.MODEL_ID_PARAMETER, "-1");
-			// parameters.put(ShapewaysClient.MATERIAL_ID_PARAMETER, "-1");
-			// parameters.put(ShapewaysClient.QUANTITY_ID_PARAMETER, "-1");
 			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().postResponse(
-					ShapewaysClient.API_URL_BASE + ShapewaysClient.PRICES_PATH, parameters);
+					ShapewaysClient.API_URL_BASE + ShapewaysClient.PRICES_PATH, "");
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -309,7 +352,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	/////////////////// Testing
+	// ///////////////// Testing
 
 	public void doOAuth() {
 		try {
@@ -319,18 +362,14 @@ public class MainActivity extends Activity {
 					((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getOauthTokenSecret());
 
 			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
-			// create an HTTP request to a protected resource
 			HttpGet request = new HttpGet(ShapewaysClient.API_URL_BASE + ShapewaysClient.API_PATH);
 
-			// sign the request
 			consumer.sign(request);
 
-			// send the request
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpResponse response = httpClient.execute(request);
 			Log.d(LOG_TAG, "response=" + response.getStatusLine());
 			Log.d(LOG_TAG, "response=" + EntityUtils.toString(response.getEntity()));
-
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "doOAuth", e);
 		}
@@ -344,18 +383,18 @@ public class MainActivity extends Activity {
 					((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getOauthTokenSecret());
 
 			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
-			String bodyString = ShapewaysClient.MODEL_ID_PARAMETER + "=" + URLEncoder.encode("1002632", "UTF-8") + "&" + ShapewaysClient.MATERIAL_ID_PARAMETER
-					+ "=" + URLEncoder.encode("6", "UTF-8") + "&" + ShapewaysClient.QUANTITY_ID_PARAMETER + "=" + URLEncoder.encode("1", "UTF-8");
-			HttpPost request = new HttpPost(ShapewaysClient.API_URL_BASE + ShapewaysClient.PRICES_PATH);
-			Log.d(LOG_TAG, "body=" + bodyString);
-			StringEntity body = new StringEntity(bodyString);
-			// request.setEntity(body);
-			// request.getParams().setParameter(ShapewaysClient.MODEL_ID_PARAMETER,
-			// "1002632");
-			// request.getParams().setParameter(ShapewaysClient.MATERIAL_ID_PARAMETER,
-			// "6");
-			// request.getParams().setParameter(ShapewaysClient.QUANTITY_ID_PARAMETER,
-			// "1");
+			HttpPost request = new HttpPost(ShapewaysClient.API_URL_BASE + ShapewaysClient.ORDERS_PATH);
+
+			final List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			nameValuePairs.add(new BasicNameValuePair(ShapewaysClient.MODEL_ID_PARAMETER, "1002632"));
+			nameValuePairs.add(new BasicNameValuePair(ShapewaysClient.MATERIAL_ID_PARAMETER, "6"));
+			nameValuePairs.add(new BasicNameValuePair(ShapewaysClient.QUANTITY_ID_PARAMETER, "1"));
+
+			// request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+			StringEntity se = new StringEntity("{\"modelId\":1002632,\"materialId\":6,\"quantity\":1}");
+			request.setEntity(se);
+			request.setHeader("Content-Type", "application/json");
 
 			consumer.sign(request);
 

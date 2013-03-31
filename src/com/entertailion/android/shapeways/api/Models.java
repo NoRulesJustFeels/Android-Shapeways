@@ -37,19 +37,19 @@ public class Models extends Base {
 	private static final String LOG_TAG = "Models";
 	
 	// {"result":"success","models":[{"modelId":"1002632","modelVersion":"0","modelTitle":"Original-52936"}],"nextActionSuggestions":[]}
-	
+
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public static class Model {
-		private String modelId, modelTitle;
-		private int modelVersion;
+	public static class ModelsModel {
+		private String modelTitle;
+		private int modelId, modelVersion;
 		
 		@JsonProperty("modelId")
-		public String getModelId() {
+		public int getModelId() {
 			return modelId;
 		}
 
 		@JsonProperty("modelId")
-		public void setModelId(String modelId) {
+		public void setModelId(int modelId) {
 			this.modelId = modelId;
 		}
 
@@ -79,15 +79,15 @@ public class Models extends Base {
 		}
 	}
 	
-	private List<Model> models;
+	private List<ModelsModel> models;
 	
 	@JsonProperty("models")
-	public List<Model> getModels() {
+	public List<ModelsModel> getModels() {
 		return models;
 	}
 
 	@JsonProperty("models")
-	public void setModels(List<Model> models) {
+	public void setModels(List<ModelsModel> models) {
 		this.models = models;
 	}
 

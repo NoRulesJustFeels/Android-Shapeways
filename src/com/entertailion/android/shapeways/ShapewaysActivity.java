@@ -15,7 +15,6 @@
  */
 package com.entertailion.android.shapeways;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
@@ -36,19 +35,7 @@ import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.entertailion.android.shapeways.api.Base;
-import com.entertailion.android.shapeways.api.Base.Result;
-import com.entertailion.android.shapeways.api.Materials;
-import com.entertailion.android.shapeways.api.Materials.Material;
-import com.entertailion.android.shapeways.api.Models;
-import com.entertailion.android.shapeways.api.Orders;
-import com.entertailion.android.shapeways.api.Prices;
-import com.entertailion.android.shapeways.api.Printers;
 import com.entertailion.android.shapeways.api.ShapewaysClient;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Activity for user authentication using web-based login

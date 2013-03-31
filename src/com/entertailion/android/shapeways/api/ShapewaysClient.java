@@ -30,8 +30,10 @@ import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
@@ -263,15 +265,16 @@ public class ShapewaysClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public String postResponse(String apiUrl, Map<String, String> parameters) throws Exception {
+	public String postResponse(String apiUrl, String jsonParameters) throws Exception {
 		Log.d(LOG_TAG, "postResponse: url=" + apiUrl);
 		String response = null;
 		try {
 			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
 			HttpPost request = new HttpPost(apiUrl);
-			for (String key : parameters.keySet()) {
-				request.getParams().setParameter(key, parameters.get(key));
-			}
+			StringEntity se = new StringEntity(jsonParameters); // {\"modelId\":1002632,\"materialId\":6,\"quantity\":1}
+			request.setEntity(se);
+			request.setHeader("Content-Type", "application/json");
+
 			consumer.sign(request);
 
 			HttpClient httpClient = new DefaultHttpClient();
@@ -281,6 +284,33 @@ public class ShapewaysClient {
 			Log.d(LOG_TAG, "response=" + response);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "postResponse", e);
+		}
+		return response;
+	}
+
+	/**
+	 * Call a Shapeways API with DELETE
+	 * 
+	 * @param apiUrl
+	 * @return
+	 * @throws Exception
+	 */
+	public String deleteResponse(String apiUrl) throws Exception {
+		Log.d(LOG_TAG, "deleteResponse: url=" + apiUrl);
+		String response = null;
+		try {
+			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
+			HttpDelete request = new HttpDelete(apiUrl);
+
+			consumer.sign(request);
+
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse httpResponse = httpClient.execute(request);
+			Log.d(LOG_TAG, "status=" + httpResponse.getStatusLine());
+			response = EntityUtils.toString(httpResponse.getEntity());
+			Log.d(LOG_TAG, "response=" + response);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "deleteResponse", e);
 		}
 		return response;
 	}
