@@ -23,12 +23,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Base class for Jackson JSON library data binding of Shapeways API responses
+ * 
  * @see http://wiki.fasterxml.com/JacksonDocumentation
- * @see http://programmerbruce.blogspot.co.uk/2011/05/deserialize-json-with-jackson-into.html
+ * @see http
+ *      ://programmerbruce.blogspot.co.uk/2011/05/deserialize-json-with-jackson
+ *      -into.html
  * @see http://developers.shapeways.com/docs?li=d_gettingStarted
  * 
  * @author leon_nicholls
- *
+ * 
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Base {
@@ -44,10 +47,13 @@ public class Base {
 	// discovery system without OAuth1 keys}}}
 
 	public enum Result {
+		// {"result":"success","itemCount":0,"items":[],"nextActionSuggestions":[]}
+		// {"result":"failure","reason":"\n Field <modelId> is required, but missing."}
 		success, failure
 	};
 
 	private Result result;
+	private String reason; // failure reason
 	private RateLimit rateLimit;
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -123,6 +129,16 @@ public class Base {
 	@JsonProperty("result")
 	public void setResult(Result result) {
 		this.result = result;
+	}
+
+	@JsonProperty("reason")
+	public String getReason() {
+		return reason;
+	}
+
+	@JsonProperty("reason")
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
 	@JsonProperty("rateLimit")

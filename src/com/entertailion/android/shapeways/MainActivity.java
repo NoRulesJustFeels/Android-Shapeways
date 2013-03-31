@@ -15,8 +15,20 @@
  */
 package com.entertailion.android.shapeways;
 
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+
+import oauth.signpost.OAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -53,8 +65,8 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		
-		if (((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getOauthToken()==null) {
+
+		if (((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getOauthToken() == null) {
 			// Get the OAuth token; launch activity to show webview for user
 			// authorization
 			new Thread(new Runnable() {
@@ -67,18 +79,18 @@ public class MainActivity extends Activity {
 					}
 				}
 			}).start();
-		} 
-		
+		}
+
 		((Button) findViewById(R.id.button_api)).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				new Thread(new Runnable() {
 					public void run() {
 						getApi();
-						// getOrders();
-						getPrinters();
-						getMaterials();
+						//getOrders();
+						// getPrinters();
+						// getMaterials();
 						// postOrder();
-						getModels();
+						// getModels();
 						// postPrices();
 					}
 				}).start();
@@ -142,8 +154,9 @@ public class MainActivity extends Activity {
 			Map<String, Object> map = mapper.readValue(response, Map.class);
 			Log.i(LOG_TAG, "map=" + map);
 
-			// Orders orders = mapper.readValue(response, Orders.class);
+			Orders orders = mapper.readValue(response, Orders.class);
 			// Log.i(LOG_TAG, "result=" + orders.getResult());
+			Log.i(LOG_TAG, "reason=" + orders.getReason());
 			// Log.i(LOG_TAG, "getItemCount=" + orders.getItemCount());
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "postOrder", e);
@@ -293,6 +306,66 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "prices=" + prices.getPrices().size());
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "postPrices", e);
+		}
+	}
+
+	/////////////////// Testing
+
+	public void doOAuth() {
+		try {
+			OAuthConsumer consumer = new CommonsHttpOAuthConsumer(ShapewaysApplication.CONSUMER_KEY, ShapewaysApplication.CONSUMER_SECRET);
+
+			consumer.setTokenWithSecret(((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getOauthToken(),
+					((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getOauthTokenSecret());
+
+			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
+			// create an HTTP request to a protected resource
+			HttpGet request = new HttpGet(ShapewaysClient.API_URL_BASE + ShapewaysClient.API_PATH);
+
+			// sign the request
+			consumer.sign(request);
+
+			// send the request
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse response = httpClient.execute(request);
+			Log.d(LOG_TAG, "response=" + response.getStatusLine());
+			Log.d(LOG_TAG, "response=" + EntityUtils.toString(response.getEntity()));
+
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "doOAuth", e);
+		}
+	}
+
+	public void doOAuth1() {
+		try {
+			OAuthConsumer consumer = new CommonsHttpOAuthConsumer(ShapewaysApplication.CONSUMER_KEY, ShapewaysApplication.CONSUMER_SECRET);
+
+			consumer.setTokenWithSecret(((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getOauthToken(),
+					((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getOauthTokenSecret());
+
+			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
+			String bodyString = ShapewaysClient.MODEL_ID_PARAMETER + "=" + URLEncoder.encode("1002632", "UTF-8") + "&" + ShapewaysClient.MATERIAL_ID_PARAMETER
+					+ "=" + URLEncoder.encode("6", "UTF-8") + "&" + ShapewaysClient.QUANTITY_ID_PARAMETER + "=" + URLEncoder.encode("1", "UTF-8");
+			HttpPost request = new HttpPost(ShapewaysClient.API_URL_BASE + ShapewaysClient.PRICES_PATH);
+			Log.d(LOG_TAG, "body=" + bodyString);
+			StringEntity body = new StringEntity(bodyString);
+			// request.setEntity(body);
+			// request.getParams().setParameter(ShapewaysClient.MODEL_ID_PARAMETER,
+			// "1002632");
+			// request.getParams().setParameter(ShapewaysClient.MATERIAL_ID_PARAMETER,
+			// "6");
+			// request.getParams().setParameter(ShapewaysClient.QUANTITY_ID_PARAMETER,
+			// "1");
+
+			consumer.sign(request);
+
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse response = httpClient.execute(request);
+
+			Log.d(LOG_TAG, "response=" + response.getStatusLine());
+			Log.d(LOG_TAG, "response=" + EntityUtils.toString(response.getEntity()));
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "doOAuth", e);
 		}
 	}
 

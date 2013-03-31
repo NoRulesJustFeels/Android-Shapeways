@@ -30,8 +30,8 @@ public class ShapewaysApplication extends Application {
 	private static final String LOG_TAG = "ShapewaysApplication";
 	
 	// http://developers.shapeways.com/manage-apps
-	private static final String CONSUMER_KEY = "";
-	private static final String CONSUMER_SECRET = "";
+	public static final String CONSUMER_KEY = "";
+	public static final String CONSUMER_SECRET = "";
 	
 	private ShapewaysClient shapewaysClient;
 

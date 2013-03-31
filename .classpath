@@ -11,5 +11,10 @@
 	<classpathentry kind="lib" path="libs/jackson-databind.jar"/>
 	<classpathentry kind="lib" path="libs/jackson-annotations.jar"/>
 	<classpathentry kind="lib" path="libs/bcprov-jdk15on.jar"/>
+	<classpathentry kind="lib" path="libs/signpost-commonshttp4.jar"/>
+	<classpathentry kind="lib" path="libs/commons-logging.jar"/>
+	<classpathentry kind="lib" path="libs/httpclient.jar"/>
+	<classpathentry kind="lib" path="libs/httpcore.jar"/>
+	<classpathentry kind="lib" path="libs/signpost-core.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

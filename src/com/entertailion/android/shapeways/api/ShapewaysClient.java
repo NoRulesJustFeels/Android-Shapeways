@@ -25,10 +25,22 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import oauth.signpost.OAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.entertailion.android.shapeways.ShapewaysApplication;
 
 /**
  * OAuth 1.0 client for Shapeways API.
@@ -44,22 +56,22 @@ public class ShapewaysClient {
 
 	// http://developers.shapeways.com/docs?li=d_gettingStarted
 	public static final String API_URL_BASE = "http://api.shapeways.com";
-	private static final String REQUEST_TOKEN_PATH = "/oauth1/request_token/v1";
-	private static final String ACCESS_TOKEN_PATH = "/oauth1/access_token/v1";
+	public static final String REQUEST_TOKEN_PATH = "/oauth1/request_token/v1";
+	public static final String ACCESS_TOKEN_PATH = "/oauth1/access_token/v1";
 	public static final String API_PATH = "/api/v1/";
 	public static final String ORDERS_PATH = "/orders/cart/v1";
 	public static final String MATERIALS_PATH = "/materials/v1";
 	public static final String MATERIAL_PATH = "/materials/%s/v1"; // /materials/{materialId}/v1
 	public static final String MODELS_PATH = "/models/v1/";
-	public static final String MODEL_PATH = "/models/%s/v1";  // /models/{modelId}/v1
-	public static final String MODEL_INFO_PATH = "/models/%s/v1";  // /models/{modelId}/info/v1
-	public static final String MODEL_FILES_PATH = "/models/%s/files/v1/";  // /models/{modelId}/files/v1/
-	public static final String MODEL_FILES_VERSION_PATH = "/models/%s/files/%s/v1";  // /models/{modelId}/files/{fileVersion}/v1
-	public static final String MODEL_PHOTOS_PATH = "/models/%s/photos/v1";  // /models/{modelId}/photos/v1
+	public static final String MODEL_PATH = "/models/%s/v1"; // /models/{modelId}/v1
+	public static final String MODEL_INFO_PATH = "/models/%s/v1"; // /models/{modelId}/info/v1
+	public static final String MODEL_FILES_PATH = "/models/%s/files/v1/"; // /models/{modelId}/files/v1/
+	public static final String MODEL_FILES_VERSION_PATH = "/models/%s/files/%s/v1"; // /models/{modelId}/files/{fileVersion}/v1
+	public static final String MODEL_PHOTOS_PATH = "/models/%s/photos/v1"; // /models/{modelId}/photos/v1
 	public static final String PRINTERS_PATH = "/printers/v1";
 	public static final String PRINTER_PATH = "/printers/%s/v1"; // /printers/{printerId}/v1
-	public static final String PRICES_PATH = "/prices/v1";
-	
+	public static final String PRICES_PATH = "/price/v1";
+
 	public static final String MODEL_ID_PARAMETER = "modelId";
 	public static final String MATERIAL_ID_PARAMETER = "materialId";
 	public static final String QUANTITY_ID_PARAMETER = "quantity";
@@ -92,6 +104,7 @@ public class ShapewaysClient {
 	private final String consumerSecret;
 	private String oauthToken;
 	private String oauthTokenSecret;
+	private OAuthConsumer consumer; // https://code.google.com/p/oauth-signpost/
 
 	/**
 	 * Register your app to get a consumer key and secret
@@ -105,11 +118,15 @@ public class ShapewaysClient {
 		this.context = context;
 		this.consumerKey = consumerKey;
 		this.consumerSecret = consumerSecret;
-		
+
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		// check if OAuth token obtained before
 		oauthToken = preferences.getString(ShapewaysClient.OAUTH_TOKEN, null);
 		oauthTokenSecret = preferences.getString(ShapewaysClient.OAUTH_TOKEN_SECRET, null);
+
+		// https://code.google.com/p/oauth-signpost/wiki/GettingStarted
+		consumer = new CommonsHttpOAuthConsumer(ShapewaysApplication.CONSUMER_KEY, ShapewaysApplication.CONSUMER_SECRET);
+		consumer.setTokenWithSecret(oauthToken, oauthTokenSecret);
 	}
 
 	/**
@@ -171,7 +188,7 @@ public class ShapewaysClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getResponse(String apiUrl) throws Exception {
+	private String getResponseOld(String apiUrl) throws Exception {
 		Log.d(LOG_TAG, "getResponse: url=" + apiUrl);
 		Request request = new Request(GET);
 		request.addParameter(OAUTH_CONSUMER_KEY, consumerKey);
@@ -182,7 +199,63 @@ public class ShapewaysClient {
 
 		return readResponse(urlConnection.getInputStream());
 	}
-	
+
+	/**
+	 * Call a Shapeways API with GET
+	 * 
+	 * @param apiUrl
+	 * @param requestToken
+	 * @param requestTokenSecret
+	 * @return
+	 * @throws Exception
+	 */
+	public String getResponse(String apiUrl) throws Exception {
+		Log.d(LOG_TAG, "getResponse: url=" + apiUrl);
+		String response = null;
+		try {
+			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
+			HttpGet request = new HttpGet(apiUrl);
+			consumer.sign(request);
+
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse httpResponse = httpClient.execute(request);
+			Log.d(LOG_TAG, "status=" + httpResponse.getStatusLine());
+			response = EntityUtils.toString(httpResponse.getEntity());
+			Log.d(LOG_TAG, "response=" + response);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "getResponse", e);
+		}
+		return response;
+	}
+
+	/**
+	 * Call a Shapeways API with POST
+	 * 
+	 * @param apiUrl
+	 * @return
+	 * @throws Exception
+	 */
+	private String postResponseOld(String apiUrl, Map<String, String> parameters) throws Exception {
+		Log.d(LOG_TAG, "postResponse: url=" + apiUrl);
+		URLConnection urlConnection = getUrlConnection(apiUrl, true);
+
+		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(urlConnection.getOutputStream());
+
+		Request request = new Request(POST);
+		request.addParameter(OAUTH_CONSUMER_KEY, consumerKey);
+		request.addParameter(OAUTH_TOKEN, oauthToken);
+
+		for (String key : parameters.keySet()) {
+			request.addParameter(key, parameters.get(key));
+		}
+
+		request.sign(apiUrl, consumerSecret, oauthTokenSecret);
+		outputStreamWriter.write(request.toString());
+		outputStreamWriter.close();
+
+		return readResponse(urlConnection.getInputStream());
+	}
+
 	/**
 	 * Call a Shapeways API with POST
 	 * 
@@ -192,23 +265,24 @@ public class ShapewaysClient {
 	 */
 	public String postResponse(String apiUrl, Map<String, String> parameters) throws Exception {
 		Log.d(LOG_TAG, "postResponse: url=" + apiUrl);
-		URLConnection urlConnection = getUrlConnection(apiUrl, true);
+		String response = null;
+		try {
+			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
+			HttpPost request = new HttpPost(apiUrl);
+			for (String key : parameters.keySet()) {
+				request.getParams().setParameter(key, parameters.get(key));
+			}
+			consumer.sign(request);
 
-		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(urlConnection.getOutputStream());
-
-		Request request = new Request(POST);
-		request.addParameter(OAUTH_CONSUMER_KEY, consumerKey);
-		request.addParameter(OAUTH_TOKEN, oauthToken);
-		
-		for(String key : parameters.keySet()) {
-			request.addParameter(key, parameters.get(key));
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse httpResponse = httpClient.execute(request);
+			Log.d(LOG_TAG, "status=" + httpResponse.getStatusLine());
+			response = EntityUtils.toString(httpResponse.getEntity());
+			Log.d(LOG_TAG, "response=" + response);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "postResponse", e);
 		}
-		
-		request.sign(apiUrl, consumerSecret, oauthTokenSecret);
-		outputStreamWriter.write(request.toString());
-		outputStreamWriter.close();
-
-		return readResponse(urlConnection.getInputStream());
+		return response;
 	}
 
 	/**
@@ -278,14 +352,16 @@ public class ShapewaysClient {
 		}
 		return URLDecoder.decode(value, ENCODING);
 	}
-	
-	//////////////////////////////////////////
-	
+
+	// ////////////////////////////////////////
+
 	public void setOauthToken(String oauthToken, String oauthTokenSecret) {
 		this.oauthToken = oauthToken;
 		this.oauthTokenSecret = oauthTokenSecret;
+
+		consumer.setTokenWithSecret(oauthToken, oauthTokenSecret);
 	}
-	
+
 	public String getOauthToken() {
 		return oauthToken;
 	}
@@ -293,5 +369,5 @@ public class ShapewaysClient {
 	public String getOauthTokenSecret() {
 		return oauthTokenSecret;
 	}
-	
+
 }
