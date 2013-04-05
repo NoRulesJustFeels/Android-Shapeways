@@ -93,11 +93,10 @@ public class MainActivity extends Activity {
 						// getPrinters();
 						// getMaterials();
 						// postOrder();
-						//getModels();
+						// getModels();
 						// getModel();
 						// deleteModel();
 						// postPrices();
-						// doOAuth1();
 					}
 				}).start();
 			}
@@ -107,8 +106,9 @@ public class MainActivity extends Activity {
 	private void getApi() {
 		Log.d(LOG_TAG, "getApi");
 		try {
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
 					ShapewaysClient.API_URL_BASE + ShapewaysClient.API_PATH);
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -117,6 +117,7 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "map=" + map);
 
 			Base base = mapper.readValue(response, Base.class);
+			base.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			Log.i(LOG_TAG, "result=" + base.getResult());
 			Log.i(LOG_TAG, "rateLimit.getRemaining=" + base.getRateLimit().getRemaining());
 		} catch (Exception e) {
@@ -127,8 +128,9 @@ public class MainActivity extends Activity {
 	private void getOrders() {
 		Log.d(LOG_TAG, "getOrders");
 		try {
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
 					ShapewaysClient.API_URL_BASE + ShapewaysClient.ORDERS_PATH);
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -137,6 +139,7 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "map=" + map);
 
 			Orders orders = mapper.readValue(response, Orders.class);
+			orders.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			Log.i(LOG_TAG, "result=" + orders.getResult());
 			Log.i(LOG_TAG, "getItemCount=" + orders.getItemCount());
 			if (orders.getItemCount() > 0) {
@@ -152,8 +155,9 @@ public class MainActivity extends Activity {
 	private void postOrder() {
 		Log.d(LOG_TAG, "postOrder");
 		try {
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().postResponse(
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().postResponse(
 					ShapewaysClient.API_URL_BASE + ShapewaysClient.ORDERS_PATH, "{\"modelId\":1002632,\"materialId\":6,\"quantity\":1}");
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -162,6 +166,7 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "map=" + map);
 
 			Orders orders = mapper.readValue(response, Orders.class);
+			orders.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			// Log.i(LOG_TAG, "result=" + orders.getResult());
 			Log.i(LOG_TAG, "reason=" + orders.getReason());
 			// Log.i(LOG_TAG, "getItemCount=" + orders.getItemCount());
@@ -173,8 +178,9 @@ public class MainActivity extends Activity {
 	private void getPrinters() {
 		Log.d(LOG_TAG, "getPrinters");
 		try {
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
 					ShapewaysClient.API_URL_BASE + ShapewaysClient.PRINTERS_PATH);
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -183,6 +189,7 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "map=" + map);
 
 			Printers printers = mapper.readValue(response, Printers.class);
+			printers.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			Log.i(LOG_TAG, "result=" + printers.getResult());
 			Log.i(LOG_TAG, "printers=" + printers.getPrinters().size());
 		} catch (Exception e) {
@@ -193,8 +200,9 @@ public class MainActivity extends Activity {
 	private void getMaterials() {
 		Log.d(LOG_TAG, "getMaterials");
 		try {
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
 					ShapewaysClient.API_URL_BASE + ShapewaysClient.MATERIALS_PATH);
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -208,6 +216,7 @@ public class MainActivity extends Activity {
 			MappingJsonFactory f = new MappingJsonFactory();
 			JsonParser jp = f.createJsonParser(response);
 			Materials materials = new Materials();
+			materials.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
 			while (jp.nextToken() != JsonToken.END_OBJECT) {
 				String fieldname = jp.getCurrentName();
@@ -275,8 +284,9 @@ public class MainActivity extends Activity {
 	private void getModels() {
 		Log.d(LOG_TAG, "getModels");
 		try {
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(
 					ShapewaysClient.API_URL_BASE + ShapewaysClient.MODELS_PATH);
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -285,6 +295,7 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "map=" + map);
 
 			Models models = mapper.readValue(response, Models.class);
+			models.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			Log.i(LOG_TAG, "result=" + models.getResult());
 			Log.i(LOG_TAG, "models=" + models.getModels().size());
 		} catch (Exception e) {
@@ -296,7 +307,8 @@ public class MainActivity extends Activity {
 		Log.d(LOG_TAG, "getModel");
 		try {
 			String path = String.format(ShapewaysClient.MODEL_INFO_PATH, "1002632");
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(ShapewaysClient.API_URL_BASE + path);
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().getResponse(ShapewaysClient.API_URL_BASE + path);
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -305,6 +317,7 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "map=" + map);
 
 			Model model = mapper.readValue(response, Model.class);
+			model.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			Log.i(LOG_TAG, "result=" + model.getResult());
 			Log.i(LOG_TAG, "title=" + model.getTitle());
 		} catch (Exception e) {
@@ -316,7 +329,9 @@ public class MainActivity extends Activity {
 		Log.d(LOG_TAG, "deleteModel");
 		try {
 			String path = String.format(ShapewaysClient.MODEL_INFO_PATH, "1005240");
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().deleteResponse(ShapewaysClient.API_URL_BASE + path);
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().deleteResponse(
+					ShapewaysClient.API_URL_BASE + path);
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -325,6 +340,7 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "map=" + map);
 
 			Model model = mapper.readValue(response, Model.class);
+			model.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			Log.i(LOG_TAG, "result=" + model.getResult());
 			Log.i(LOG_TAG, "title=" + model.getTitle());
 		} catch (Exception e) {
@@ -335,8 +351,9 @@ public class MainActivity extends Activity {
 	private void postPrices() {
 		Log.d(LOG_TAG, "postPrices");
 		try {
-			String response = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().postResponse(
+			HttpResponse httpResponse = ((ShapewaysApplication) getApplicationContext()).getShapewaysClient().postResponse(
 					ShapewaysClient.API_URL_BASE + ShapewaysClient.PRICES_PATH, "");
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			Log.i(LOG_TAG, "response=" + response);
 
 			// http://wiki.fasterxml.com/JacksonInFiveMinutes
@@ -345,6 +362,7 @@ public class MainActivity extends Activity {
 			Log.i(LOG_TAG, "map=" + map);
 
 			Prices prices = mapper.readValue(response, Prices.class);
+			prices.setStatusCode(httpResponse.getStatusLine().getStatusCode());
 			Log.i(LOG_TAG, "result=" + prices.getResult());
 			Log.i(LOG_TAG, "prices=" + prices.getPrices().size());
 		} catch (Exception e) {

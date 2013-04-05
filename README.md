@@ -1,7 +1,7 @@
 Android-Shapeways
 =================
 
-<p>Example app for invoking the <a href="http://developers.shapeways.com/getting-started?li=dh_gs">Shapeways API</a> from an Android app.</p>
+<p>Example app for invoking the <a href="http://developers.shapeways.com/getting-started?li=dh_gs">Shapeways API</a> from Android.</p>
 
 <p>To run the App: 
 <ul>

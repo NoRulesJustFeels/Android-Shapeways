@@ -35,7 +35,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -100,6 +99,12 @@ public class ShapewaysClient {
 	public static final String OAUTH_SIGNATURE_METHOD_HMAC_SHA1 = "HMAC-SHA1";
 
 	public static final String OAUTH_SIGNATURE = "oauth_signature";
+
+	public static final int OK_STATUS_CODE = 200;
+	public static final int INVALID_REQUEST_STATUS_CODE = 500;
+	public static final int RATE_LIMIT_STATUS_CODE = 429;
+	public static final int OAUTH_ERROR_STATUS_CODE = 401;
+	public static final int UNIMPLEMENTED_METHOD_STATUS_CODE = 405;
 
 	private Context context;
 	private final String consumerKey;
@@ -211,23 +216,21 @@ public class ShapewaysClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getResponse(String apiUrl) throws Exception {
+	public HttpResponse getResponse(String apiUrl) throws Exception {
 		Log.d(LOG_TAG, "getResponse: url=" + apiUrl);
-		String response = null;
+		HttpResponse httpResponse = null;
 		try {
 			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
 			HttpGet request = new HttpGet(apiUrl);
 			consumer.sign(request);
 
 			HttpClient httpClient = new DefaultHttpClient();
-			HttpResponse httpResponse = httpClient.execute(request);
+			httpResponse = httpClient.execute(request);
 			Log.d(LOG_TAG, "status=" + httpResponse.getStatusLine());
-			response = EntityUtils.toString(httpResponse.getEntity());
-			Log.d(LOG_TAG, "response=" + response);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "getResponse", e);
 		}
-		return response;
+		return httpResponse;
 	}
 
 	/**
@@ -265,9 +268,9 @@ public class ShapewaysClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public String postResponse(String apiUrl, String jsonParameters) throws Exception {
+	public HttpResponse postResponse(String apiUrl, String jsonParameters) throws Exception {
 		Log.d(LOG_TAG, "postResponse: url=" + apiUrl);
-		String response = null;
+		HttpResponse httpResponse = null;
 		try {
 			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
 			HttpPost request = new HttpPost(apiUrl);
@@ -278,14 +281,12 @@ public class ShapewaysClient {
 			consumer.sign(request);
 
 			HttpClient httpClient = new DefaultHttpClient();
-			HttpResponse httpResponse = httpClient.execute(request);
+			httpResponse = httpClient.execute(request);
 			Log.d(LOG_TAG, "status=" + httpResponse.getStatusLine());
-			response = EntityUtils.toString(httpResponse.getEntity());
-			Log.d(LOG_TAG, "response=" + response);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "postResponse", e);
 		}
-		return response;
+		return httpResponse;
 	}
 
 	/**
@@ -295,9 +296,9 @@ public class ShapewaysClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public String deleteResponse(String apiUrl) throws Exception {
+	public HttpResponse deleteResponse(String apiUrl) throws Exception {
 		Log.d(LOG_TAG, "deleteResponse: url=" + apiUrl);
-		String response = null;
+		HttpResponse httpResponse = null;
 		try {
 			// http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e68
 			HttpDelete request = new HttpDelete(apiUrl);
@@ -305,14 +306,12 @@ public class ShapewaysClient {
 			consumer.sign(request);
 
 			HttpClient httpClient = new DefaultHttpClient();
-			HttpResponse httpResponse = httpClient.execute(request);
+			httpResponse = httpClient.execute(request);
 			Log.d(LOG_TAG, "status=" + httpResponse.getStatusLine());
-			response = EntityUtils.toString(httpResponse.getEntity());
-			Log.d(LOG_TAG, "response=" + response);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "deleteResponse", e);
 		}
-		return response;
+		return httpResponse;
 	}
 
 	/**

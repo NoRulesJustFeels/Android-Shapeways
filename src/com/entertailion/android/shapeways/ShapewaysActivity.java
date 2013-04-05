@@ -38,7 +38,7 @@ import android.webkit.WebViewClient;
 import com.entertailion.android.shapeways.api.ShapewaysClient;
 
 /**
- * Activity for user authentication using web-based login
+ * Activity for user authorization using web-based login
  * 
  * @author leon_nicholls
  * 

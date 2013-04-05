@@ -54,6 +54,8 @@ public class Base {
 	};
 
 	private Result result;
+	private int statusCode = ShapewaysClient.OK_STATUS_CODE;
+
 	private String reason; // failure reason
 	private RateLimit rateLimit;
 
@@ -130,6 +132,14 @@ public class Base {
 	@JsonProperty("result")
 	public void setResult(Result result) {
 		this.result = result;
+	}
+	
+	public int getStatusCode() {
+		return statusCode;
+	}
+
+	public void setStatusCode(int statusCode) {
+		this.statusCode = statusCode;
 	}
 
 	@JsonProperty("reason")
